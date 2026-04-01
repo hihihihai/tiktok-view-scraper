@@ -31,16 +31,20 @@ export default async (req, context) => {
   // Mark as pending
   await store.setJSON(requestId, { status: "pending" });
 
-  // Validate URL
-  const urlPattern = /^https?:\/\/(www\.)?tiktok\.com\/@[\w.]+\/?$/;
-  if (!profileUrl || !urlPattern.test(profileUrl)) {
+  // Extract profile URL from any TikTok link (video, profile, etc.)
+  let finalUrl = profileUrl;
+  const profileMatch = (profileUrl || "").match(
+    /^(https?:\/\/(www\.)?tiktok\.com\/@[\w.]+)/
+  );
+  if (!profileMatch) {
     await store.setJSON(requestId, {
       status: "error",
       message:
-        "올바른 TikTok 프로필 URL을 입력해주세요 (예: https://www.tiktok.com/@username)",
+        "올바른 TikTok URL을 입력해주세요 (예: https://www.tiktok.com/@username 또는 영상 링크)",
     });
     return new Response("done", { status: 200 });
   }
+  finalUrl = profileMatch[1];
 
   let browser = null;
 
@@ -69,7 +73,7 @@ export default async (req, context) => {
     });
 
     // Navigate to profile
-    await page.goto(profileUrl, {
+    await page.goto(finalUrl, {
       waitUntil: "networkidle0",
       timeout: 60000,
     });

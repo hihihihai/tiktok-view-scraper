@@ -139,10 +139,14 @@ async function startScrape() {
   // Remove query params and trailing slashes
   url = url.split("?")[0].replace(/\/+$/, "");
 
-  const urlPattern = /^https?:\/\/(www\.)?tiktok\.com\/@[\w.]+$/;
-  if (!urlPattern.test(url)) {
+  // Extract profile URL from video/other subpages
+  // e.g. https://www.tiktok.com/@lo2ee2/video/123456 → https://www.tiktok.com/@lo2ee2
+  const profileMatch = url.match(/^(https?:\/\/(www\.)?tiktok\.com\/@[\w.]+)/);
+  if (profileMatch) {
+    url = profileMatch[1];
+  } else {
     showError(
-      "올바른 TikTok 프로필 URL을 입력해주세요.\n예: https://www.tiktok.com/@username 또는 @username"
+      "올바른 TikTok URL을 입력해주세요.\n예: https://www.tiktok.com/@username 또는 영상 링크"
     );
     return;
   }
