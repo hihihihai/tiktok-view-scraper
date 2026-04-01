@@ -12,7 +12,10 @@
       "WebFetch(domain:scrapfly.io)",
       "WebFetch(domain:dev.to)",
       "WebFetch(domain:bitsofco.de)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(gh repo:*)",
+      "Bash(npx netlify-cli:*)",
+      "Bash(cd:*)"
     ]
   }
 }

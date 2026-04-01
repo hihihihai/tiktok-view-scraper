@@ -1,6 +1,3 @@
-const POLL_INTERVAL = 3000; // 3초
-const POLL_TIMEOUT = 90000; // 90초
-
 function showError(message) {
   const el = document.getElementById("error");
   el.textContent = message;
@@ -82,39 +79,6 @@ function copyToClipboard() {
   });
 }
 
-async function pollResult(requestId) {
-  const startTime = Date.now();
-
-  while (Date.now() - startTime < POLL_TIMEOUT) {
-    try {
-      const res = await fetch(
-        `/.netlify/functions/scrape-result?requestId=${requestId}`
-      );
-      const data = await res.json();
-
-      if (data.status === "complete") {
-        return data.data;
-      }
-
-      if (data.status === "error") {
-        throw new Error(data.message);
-      }
-
-      // Still pending - wait and retry
-    } catch (err) {
-      if (err.message && !err.message.includes("fetch")) {
-        throw err;
-      }
-    }
-
-    await new Promise((r) => setTimeout(r, POLL_INTERVAL));
-  }
-
-  throw new Error(
-    "요청 시간이 초과되었습니다 (90초). TikTok 서버가 느리거나 차단되었을 수 있습니다. 잠시 후 다시 시도해주세요."
-  );
-}
-
 async function startScrape() {
   const input = document.getElementById("profileUrl");
   let url = input.value.trim();
@@ -140,7 +104,6 @@ async function startScrape() {
   url = url.split("?")[0].replace(/\/+$/, "");
 
   // Extract profile URL from video/other subpages
-  // e.g. https://www.tiktok.com/@lo2ee2/video/123456 → https://www.tiktok.com/@lo2ee2
   const profileMatch = url.match(/^(https?:\/\/(www\.)?tiktok\.com\/@[\w.]+)/);
   if (profileMatch) {
     url = profileMatch[1];
@@ -151,28 +114,27 @@ async function startScrape() {
     return;
   }
 
-  const requestId = crypto.randomUUID();
-
   setButtonDisabled(true);
   showLoading(true);
 
   try {
-    // Trigger background scrape
-    const res = await fetch("/.netlify/functions/scrape-background", {
+    const res = await fetch("/.netlify/functions/scrape", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ profileUrl: url, requestId }),
+      body: JSON.stringify({ profileUrl: url }),
     });
 
-    if (!res.ok && res.status !== 202) {
-      throw new Error(`서버 오류 (${res.status}). 잠시 후 다시 시도해주세요.`);
-    }
+    const data = await res.json();
 
-    // Poll for results
-    const data = await pollResult(requestId);
-    renderResults(data);
+    if (data.status === "complete") {
+      renderResults(data.data);
+    } else if (data.status === "error") {
+      showError(data.message);
+    } else {
+      showError("알 수 없는 응답입니다. 다시 시도해주세요.");
+    }
   } catch (err) {
-    showError(err.message);
+    showError("네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요.");
   } finally {
     setButtonDisabled(false);
     showLoading(false);
