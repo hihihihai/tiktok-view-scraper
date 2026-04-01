@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TikTok 조회수 크롤러</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>TikTok 조회수 크롤러</h1>
+    <p class="subtitle">프로필 URL을 입력하면 최근 7개 영상의 조회수를 가져옵니다</p>
+
+    <div class="input-group">
+      <input
+        type="text"
+        id="profileUrl"
+        placeholder="https://www.tiktok.com/@username"
+        autocomplete="off"
+      >
+      <button id="scrapeBtn" onclick="startScrape()">조회</button>
+    </div>
+    <p class="hint">예: https://www.tiktok.com/@username</p>
+
+    <div id="loading" class="loading hidden">
+      <div class="spinner"></div>
+      <p id="loadingText">크롤링 중... 최대 30초 정도 걸릴 수 있습니다</p>
+    </div>
+
+    <div id="error" class="error hidden"></div>
+
+    <div id="results" class="results hidden">
+      <div class="follower-section">
+        <span class="label">팔로워</span>
+        <span id="followerCount" class="follower-count"></span>
+      </div>
+
+      <div class="copy-section">
+        <h3>조회수 (엑셀 가로 붙여넣기용)</h3>
+        <div class="copy-row">
+          <input type="text" id="viewCounts" readonly>
+          <button onclick="copyToClipboard()">복사</button>
+        </div>
+        <p id="copyFeedback" class="copy-feedback hidden">복사됨!</p>
+      </div>
+
+      <div class="table-section">
+        <h3>영상 상세 정보</h3>
+        <table id="videoTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>업로드일</th>
+              <th>조회수</th>
+              <th>설명</th>
+            </tr>
+          </thead>
+          <tbody id="videoBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

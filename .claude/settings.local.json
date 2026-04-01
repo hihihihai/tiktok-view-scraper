@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm info:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:www.npmjs.com)",
+      "WebFetch(domain:answers.netlify.com)",
+      "WebFetch(domain:www.tiktok.com)",
+      "WebFetch(domain:www.netlify.com)",
+      "WebSearch",
+      "WebFetch(domain:www.blackspike.com)",
+      "WebFetch(domain:scrapfly.io)",
+      "WebFetch(domain:dev.to)",
+      "WebFetch(domain:bitsofco.de)",
+      "Bash(npm install:*)"
+    ]
+  }
+}
